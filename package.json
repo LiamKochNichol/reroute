@@ -1,0 +1,15 @@
+{
+  "name": "dementia-project",
+  "version": "1.0.0",
+  "description": "server _attempt",
+  "main": "Server.js",
+  "scripts": {
+    "test": "run server.js",
+    "start": "node server.js"
+  },
+  "author": "Liam Koch Nichol",
+  "license": "UNLICENSED",
+  "dependencies": {
+    "express": "^4.17.0"
+  }
+}

@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+<title> REROUTE SYSTEM </title>
+
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+body {font-family: Arial, Helvetica, sans-serif;}
+
+/* Full-width input fields */
+input[type=text], input[type=password] {
+    width: 100%;
+    padding: 12px 20px;
+    margin: 8px 0;
+    display: inline-block;
+    border: 1px solid #ccc;
+    box-sizing: border-box;
+}
+
+/* Set a style for all buttons */
+button {
+    background-color: white;
+    border: none;
+    border-radius: 40px;
+    width: 550px;
+    color: rgba(128,128,128,1.0);
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 25px;
+    font-weight: bold;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+button:hover {
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+    opacity: 0.5;
+}
+
+/* Center the image and position the close button */
+.imgcontainer {
+    text-align: center;
+    margin: 24px 0 12px 0;
+    position: relative;
+}
+
+.container {
+    padding: 32px;
+    color: white;
+}
+
+span.psw {
+    float: right;
+    padding-top: 16px;
+}
+
+/* The Modal (background) */
+.modal {
+    display: none; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(0,0,0,0.4); /* Black w/ opacity */
+    padding-top: 60px;
+}
+
+/* Modal Content/Box */
+.modal-content {
+    background-color: rgba(20,20,20,0.7);
+    margin: 5% auto 15% auto; /* 5% from the top, 15% from the bottom and centered */
+    border-radius: 40px;
+    width: 30%; /* Could be more or less, depending on screen size */
+    height: 35%;
+    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
+}
+
+/* The Close Button (x) */
+.close {
+    position: absolute;
+    right: 25px;
+    top: 0;
+    color: rgb(255,255,255);
+    font-size: 35px;
+    font-weight: bold;
+}
+.mytext {
+    width: 100px;
+}
+.close:hover,
+.close:focus {
+    color: red;
+    cursor: pointer;
+}
+
+/* Add Zoom Animation */
+.animate {
+    -webkit-animation: animatezoom 0.6s;
+    animation: animatezoom 0.6s
+}
+
+@-webkit-keyframes animatezoom {
+    from {-webkit-transform: scale(0)}
+    to {-webkit-transform: scale(1)}
+}
+
+@keyframes animatezoom {
+    from {transform: scale(0)}
+    to {transform: scale(1)}
+}
+
+/* Change styles for span and cancel button on extra small screens */
+@media screen and (max-width: 300px) {
+    span.psw {
+        display: block;
+        float: none;
+    }
+}
+
+.tinted-image {
+
+  width: auto;
+  height: 500px;
+
+  background:
+    /* top, transparent red */
+    linear-gradient(
+      rgba(248, 203, 191, 0.95),
+      rgba(155, 219, 213, 0.95),
+      rgba(209, 198, 239, 0.95)
+    ),
+    /* bottom, image */
+    url(file:///Users/priyanshipatel/Desktop/App%20Folder%20/background.gif);
+}
+
+
+</style>
+</head>
+
+<script>
+// Get the modal
+var modal = document.getElementById('id01');
+
+// When the user clicks anywhere outside of the modal, close it
+window.onclick = function(event) {
+    if (event.target == modal) {
+        modal.style.display = "none";
+    }
+}
+
+var valid=function(){
+	var user = document.forms["login"]["user"].value;
+	var pass = document.forms["login"]["pass"].value;
+	if(user=='Fairview' && pass=='Password')
+		return true;
+	else{
+		alert('Username and password incorrect');
+		return false;
+	}
+}
+
+</script>
+
+<body>
+
+<div class="tinted-image">
+
+<div style = "text-align: center;font-size: 125px;color: white;text-shadow: -5px 7px 19px rgba(0,0,0,0.35);">
+    <h3> REROUTE </h3>
+</div>
+
+<div style="text-align: center;">
+    <button onclick="document.getElementById('id01').style.display='block';" style="width:auto;">Login</button>
+</div>
+
+<div id="id01" class="modal">
+
+    <form class="modal-content animate" name="login" action="Homepage.html" onsubmit="return valid()">
+        <div class="imgcontainer">
+            <span onclick="document.getElementById('id01').style.display='none'" class="close" title="Close Modal">&times;</span>
+        </div>
+
+        <div class="container">
+            <table>
+            <tr><td style = "text-align: left;font-size: 20px;color: white;text-shadow: -5px 7px 19px rgba(0,0,0,0.35);">Home Name</td>
+            <td><input style="height:20px;font-size:14pt;width:164px;text-align:center;" name="user"></td></tr>
+            <tr><td style = "text-align: left;font-size: 20px;color: white;text-shadow: -5px 7px 19px rgba(0,0,0,0.35);">Password</td>
+            <td><input style="height:20px;font-size:14pt;width:170px;text-align:center;" name="pass" type="password"></td></tr>
+            <tr><td><input style="background-color: white;
+                border: none;
+                border-radius: 40px;
+                width: auto;
+                color: rgba(128,128,128,1.0);
+                padding: 15px 32px;
+                text-align: center;
+                text-decoration: none;
+                font-size: 25px;
+                font-weight: bold;
+                box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);"
+                type="submit"></td></tr>
+            </table>
+        </div>
+
+    </form>
+</div>
+
+</div>
+
+</body>
+</html>
