@@ -2,15 +2,99 @@
 <html>
   <head>
     <title>King Street</title>
-    <link rel="icon" type="image/ico" href="public/img/favicon.ico">
-    <link rel="stylesheet" type="text/css" href="public/css/reset.css">
+
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <script type="text/javascript">
+
+      $(document).ready(() => {
+
+        $('#getProfile').click(() => {
+          const requestURL = 'king/' + $('#nameBox').val();
+          console.log('Making request to: ', requestURL);
+          $.ajax({
+            url: requestURL,
+            type: 'GET',
+            dataType: 'json',
+            success: (data) => {
+              if (data.name && data.room) {
+                $('#name').html('Resident Name: ' + data.name);
+                $('#room').html('Room is: ' + data.room);
+              } else {
+                $('#name').html('Name and/or.');
+                $('#room').html('Room is unknown.')
+              }
+            }
+          });
+        });
+
+        $('#genTable').click(() => {
+          $.ajax({
+            url: 'king/residents',
+            type: 'GET',
+            dataType: 'text',
+            success: (data) => {
+              data = JSON.parse(data);
+              var html = '<table class="table table-striped">';
+              html += '<tr>';
+              var flag = 0;
+              $.each(data[0], (index, value) => {
+                html += '<th>'+index+'</th>';
+              });
+              html += '</tr>';
+              $.each(data, (index, value) => {
+                html += '<tr>';
+                $.each(value, (index2, value2) => {
+                  html += '<td>'+value2+'</td>';
+                });
+                html += '<tr>';
+              });
+              html += '</table>';
+              $('#table').html(html);
+            }
+          });
+        });
+
+        $('#insertButton').click(() => {
+          $.ajax({
+            url: 'king',
+            type: 'POST',
+            data: {
+              name: $('#insertName').val(),
+              room: $('#insertRoom').val(),
+            },
+            success: (data) => {
+              $('#status').html(data.message);
+            }
+          });
+        });
+      });
+
+    </script>
   </head>
   <body>
-    <p>Residents HHFoahspgiha gashudfhapiufhauiphguiahg</p>
-    <form method="post" action="/update_profile" enctype="multipart/form-data">
-      <input type="text" name="name">
-      <input type="file" name="avatar">
-      <button type="submit">Upload</button>
-    </form>
+    <div>
+      <h2>Find A Resident</h2>
+      Name: <input id="nameBox" type="text" size="20"/>
+      <button id="genTable">Generate Table</button>
+      <button id="getProfile">Get Profile<button>
+    </div>
+
+    <div>
+      <h2>Add a Resident</h2>
+      Name: <input id="insertName" type="text" size="20"/>
+      Room: <input id="insertRoom" type="text" size="20"/>
+      <button id="insertButton">Insert Into Database</button>
+    <div>
+
+    <div>
+      <p id="name"></p>
+      <p id="room"></p>
+    </div>
+
+    <div>
+      <h3>Residents On King St.<h3>
+      <table id="table"></table>
+    </div>
+
   </body>
 </html>

@@ -10,6 +10,10 @@
   "author": "Liam Koch Nichol",
   "license": "UNLICENSED",
   "dependencies": {
-    "express": "^4.17.0"
+    "bluebird": "^3.5.5",
+    "express": "^4.17.0",
+    "jquery": "^3.4.1",
+    "sqlite3": "^4.0.8",
+    "xmlhttprequest": "^1.8.0"
   }
 }
