@@ -25,7 +25,7 @@ app.get('/dundas', (req, res) => {
 });
 
 app.get('/king/residents', (req, res) => {
-  db.all('SELECT * FROM residents', (err, rows) => {
+  db.all('SELECT * FROM residents WHERE floor = "King"', (err, rows) => {
     res.json(rows);
   });
 });
@@ -33,7 +33,7 @@ app.get('/king/residents', (req, res) => {
 app.get('/king/:name', (req, res) => {
   const lookupName = req.params.name;
   db.all(
-  'SELECT * FROM residents WHERE name=$name',
+  'SELECT * FROM residents WHERE name = $name AND floor = "King"',
     {
     $name: lookupName,
     },
@@ -51,7 +51,7 @@ app.get('/king/:name', (req, res) => {
 app.post('/king', (req, res) => {
   console.log(req.body)
   db.run(
-    'INSERT INTO residents VALUES ($name, $room)',
+    'INSERT INTO residents VALUES ($name, "King", $room, "Hello")',
     {
       $name: req.body.name,
       $room: req.body.room
@@ -66,6 +66,19 @@ app.post('/king', (req, res) => {
   )
 });
 
+app.post('/king/delete', (req, res) => {
+  resName = req.body.name;
+  if (resName) {
+    db.run(
+      'DELETE FROM residents WHERE name = ($name)',
+      {
+        $name: resName
+      });
+    res.send('Delete Success');
+  } else {
+    res.send("Error of request");
+  }
+});
 
 app.listen(PORT, () => {
   console.log(`Listening on port ${PORT}`);

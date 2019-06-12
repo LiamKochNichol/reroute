@@ -3,14 +3,15 @@ const db = new sqlite3.Database('residents.db');
 
 db.serialize(() =>{
   //start table
-  db.run("CREATE TABLE residents (name TEXT, room INTEGER)");
+  db.run("CREATE TABLE residents (name TEXT, floor TEXT, room INTEGER, route TEXT)");
   //create mock residents
-  db.run("INSERT INTO residents VALUES ('John Smith', 13)");
-  db.run("INSERT INTO residents VALUES ('Jane Doe', 58)");
-  db.run("INSERT INTO residents VALUES ('Mary Johnson', 37)");
+  db.run("INSERT INTO residents VALUES ('John Smith', 'King', 13, 'Hello')");
+  db.run("INSERT INTO residents VALUES ('Jane Doe', 'Dundas', 58, 'Hello')");
+  db.run("INSERT INTO residents VALUES ('Mary Johnson', 'Queen', 37, 'Hello')");
 
   db.each("SELECT name, room FROM residents", (err, row) => {
     console.log(row.name + " @ " + row.room);
+
   });
 });
 

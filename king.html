@@ -2,7 +2,6 @@
 <html>
   <head>
     <title>King Street</title>
-
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
     <script type="text/javascript">
 
@@ -16,39 +15,44 @@
             type: 'GET',
             dataType: 'json',
             success: (data) => {
-              if (data.name && data.room) {
+              if (data.name && data.room && data.floor && data.route) {
                 $('#name').html('Resident Name: ' + data.name);
-                $('#room').html('Room is: ' + data.room);
+                $('#room').html('Room is ye: ' + data.room);
+                $('#floor').html('Floor is: ' + data.floor);
+                $('#route').html('Route is: ' + data.route);
               } else {
                 $('#name').html('Name and/or.');
-                $('#room').html('Room is unknown.')
+                $('#room').html('Room is unknown.');
               }
             }
           });
         });
 
-        $('#genTable').click(() => {
+        $('#refreshTable').click(() => {
           $.ajax({
             url: 'king/residents',
             type: 'GET',
             dataType: 'text',
             success: (data) => {
               data = JSON.parse(data);
-              var html = '<table class="table table-striped">';
+              let html = '';
               html += '<tr>';
-              var flag = 0;
+              let flag = 0;
               $.each(data[0], (index, value) => {
-                html += '<th>'+index+'</th>';
+                html += '<th>'+index.toUpperCase() +'</th>';
               });
               html += '</tr>';
               $.each(data, (index, value) => {
                 html += '<tr>';
                 $.each(value, (index2, value2) => {
-                  html += '<td>'+value2+'</td>';
+                  if (index2 === 'name') {
+                    html += '<td><button id = ' + value2.replace(/\s/g, '') + ' onClick="clickRespond(this.id)">' + value2 + '</button></td>';
+                  } else {
+                    html += '<td>'+value2+'</td>';
+                  }
                 });
                 html += '<tr>';
               });
-              html += '</table>';
               $('#table').html(html);
             }
           });
@@ -67,33 +71,113 @@
             }
           });
         });
+
+        $('#deleteButton').click(() => {
+          let ele = document.getElementById('deleteButton');
+          let resName = ele.className;
+          resName = resName.split('_').join(' ')
+          console.log(resName);
+          $.ajax({
+            url: 'king/delete',
+            type: 'POST',
+            data: jQuery.param({
+                name: resName
+              }),
+            success: (response) => {
+              console.log('Delete request success');
+            }
+          });
+        });
+
+        document.getElementById("refreshTable").click();
+
+
+        let coll = document.getElementsByClassName("collapsible");
+        let i;
+
+        for (i = 0; i < coll.length; i++) {
+          coll[i].addEventListener("click", function() {
+            this.classList.toggle("active");
+            let content = this.nextElementSibling;
+            if (content.style.display === "none") {
+              content.style.display = "block";
+            } else {
+              content.style.display = "none";
+            }
+          });
+        }
+        for (i = 0; i < coll.length; i++) {
+          coll[i].click();
+        }
+
+        clickRespond = (clicked_id) => {
+          const resName = document.getElementById(clicked_id).innerText;
+          const requestURL = 'king/' + resName;
+          console.log('Making request to: ', requestURL);
+          $.ajax({
+            url: requestURL,
+            type: 'GET',
+            dataType: 'json',
+            success: (data) => {
+              if (data.name && data.room && data.floor && data.route) {
+                $('#name').html('Resident Name: ' + data.name);
+                $('#room').html('Room is: ' + data.room);
+                $('#floor').html('Floor is: ' + data.floor);
+                $('#deleteButton').html('Remove Resident From Database');
+                let element = document.getElementById('deleteButton');
+                let cname = element.className;
+                document.getElementById('deleteButton').classList.add(resName.split(' ').join('_'));
+                document.getElementById('deleteButton').classList.remove(cname);
+              } else {
+                $('#name').html('Name and/or');
+                $('#room').html('room is unknown.');
+              }
+            }
+          });
+        }
       });
 
     </script>
+
+    <style>
+
+    table,
+    td {
+      border: 1px solid #333;
+    }
+
+    </style>
+
   </head>
   <body>
-    <div>
-      <h2>Find A Resident</h2>
+
+    <h1>King Street</h1>
+
+    <button id="find" class="collapsible">Find A Resident</button>
+    <div class="content">
       Name: <input id="nameBox" type="text" size="20"/>
-      <button id="genTable">Generate Table</button>
       <button id="getProfile">Get Profile<button>
     </div>
 
-    <div>
-      <h2>Add a Resident</h2>
+    <button id="add" class="collapsible">Add A Resident</button>
+    <div class="content">
       Name: <input id="insertName" type="text" size="20"/>
       Room: <input id="insertRoom" type="text" size="20"/>
       <button id="insertButton">Insert Into Database</button>
-    <div>
+    </div>
 
     <div>
       <p id="name"></p>
       <p id="room"></p>
+      <p id="floor"></p>
+      <p id="route"></p>
+      <button id="deleteButton" class="empty"></button>
     </div>
 
-    <div>
+    <div class="container">
+      <button id="refreshTable">Refresh Table</button>
       <h3>Residents On King St.<h3>
-      <table id="table"></table>
+      <table id="table" class="table table-striped"></table>
     </div>
 
   </body>
