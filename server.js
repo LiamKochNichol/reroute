@@ -49,34 +49,63 @@ app.get('/king/:name', (req, res) => {
 });
 
 app.post('/king', (req, res) => {
-  console.log(req.body)
-  db.run(
-    'INSERT INTO residents VALUES ($name, "King", $room, "Hello")',
-    {
-      $name: req.body.name,
-      $room: req.body.room
-    },
-    (err) => {
-      if (err) {
-        res.send({message: 'error in app.post(/king)'});
-      } else {
-        res.send({message: 'successfully run app.post(/king)'});
+  if (req.body.name && req.body.room) {
+    db.run(
+      'INSERT INTO residents VALUES ($name, "King", $room, "Hello")',
+      {
+        $name: req.body.name,
+        $room: req.body.room
+      },
+      (err) => {
+        if (err) {
+          res.send({message: 'error in app.post(/king)'});
+        } else {
+          console.log('Post Error');
+        }
       }
-    }
-  )
+    )
+  } else {
+    console.log('Empty post')
+  }
 });
 
 app.post('/king/delete', (req, res) => {
   resName = req.body.name;
+  resRoom = req.body.room;
   if (resName) {
     db.run(
-      'DELETE FROM residents WHERE name = ($name)',
+      'DELETE FROM residents WHERE name = ($name), room = ($room)',
       {
-        $name: resName
+        $name: resName,
+        $room: resRoom
       });
     res.send('Delete Success');
   } else {
     res.send("Error of request");
+  }
+});
+
+app.post('/king/edit/:name', (req, res) => {
+  oldName = req.body.oldName;
+  oldRoom = req.body.oldRoom;
+  newName = req.body.newName;
+  newRoom = req.body.newRoom;
+  console.log("Old Name: " + oldName);
+  console.log("New Name: " + newName);
+  console.log("Old Room: " + oldRoom);
+  console.log("New Room: "+ newRoom);
+  if (oldName && oldRoom && newName && newRoom) {
+    db.run(
+      'UPDATE residents SET name = ($newName), room = ($newRoom) WHERE name = ($oldName) AND room = ($oldRoom)',
+      {
+        $newName: newName,
+        $newRoom: newRoom,
+        $oldName: oldName,
+        $oldRoom: oldRoom
+      });
+    res.send('Edit Success')
+  } else {
+    console.log("Edit error hit");
   }
 });
 

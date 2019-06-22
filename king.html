@@ -1,31 +1,18 @@
 <<!DOCTYPE html>
 <html>
   <head>
-    <title>King Street</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <title>King Street</title>
+
     <script type="text/javascript">
 
       $(document).ready(() => {
 
         $('#getProfile').click(() => {
-          const requestURL = 'king/' + $('#nameBox').val();
-          console.log('Making request to: ', requestURL);
-          $.ajax({
-            url: requestURL,
-            type: 'GET',
-            dataType: 'json',
-            success: (data) => {
-              if (data.name && data.room && data.floor && data.route) {
-                $('#name').html('Resident Name: ' + data.name);
-                $('#room').html('Room is ye: ' + data.room);
-                $('#floor').html('Floor is: ' + data.floor);
-                $('#route').html('Route is: ' + data.route);
-              } else {
-                $('#name').html('Name and/or.');
-                $('#room').html('Room is unknown.');
-              }
-            }
-          });
+          let resName = $('#nameBox').val()
+          residentInfo(resName);
         });
 
         $('#refreshTable').click(() => {
@@ -40,13 +27,26 @@
               let flag = 0;
               $.each(data[0], (index, value) => {
                 html += '<th>'+index.toUpperCase() +'</th>';
-              });
+              })
               html += '</tr>';
               $.each(data, (index, value) => {
                 html += '<tr>';
                 $.each(value, (index2, value2) => {
-                  if (index2 === 'name') {
-                    html += '<td><button id = ' + value2.replace(/\s/g, '') + ' onClick="clickRespond(this.id)">' + value2 + '</button></td>';
+                  if (value2 === null) {
+                    html += '<td>NULL</td>';
+                  } else if (index2 === 'name') {
+                    let i = 0;
+                    let cnt = 0;
+                    for (i = 0; i < value2.length; i++) {
+                      if (value2[i] === ' ') {
+                        cnt = 1;
+                      }
+                    }
+                    if (cnt === 1) {
+                      html += '<td><button id = ' + value2.replace(/\s/g, '') + ' onClick="tableRespond(this.id)">' + value2 + '</button></td>';
+                    } else {
+                      html += '<td><button id = ' + value2 + ' onClick="tableRespond(this.id)">' + value2 + '</button></td>';
+                    }
                   } else {
                     html += '<td>'+value2+'</td>';
                   }
@@ -67,16 +67,15 @@
               room: $('#insertRoom').val(),
             },
             success: (data) => {
-              $('#status').html(data.message);
+              console.log('Insert success');
             }
           });
         });
 
         $('#deleteButton').click(() => {
-          let ele = document.getElementById('deleteButton');
+          let ele = document.getElementById('save');
           let resName = ele.className;
-          resName = resName.split('_').join(' ')
-          console.log(resName);
+          resName = resName.split('_').join(' ');
           $.ajax({
             url: 'king/delete',
             type: 'POST',
@@ -89,8 +88,38 @@
           });
         });
 
-        document.getElementById("refreshTable").click();
+        $('#editButton').click(() => {
+          let ele = document.getElementById('saveName');
+          let resName = ele.className;
+          resName = resName.split('_').join(' ');
+          requestURL = 'king/' + resName;
+          $.ajax({
+            url: requestURL,
+            type: 'GET',
+            dataType: 'json',
+            success: (data) => {
+              if (data.name && data.room && data.floor && data.route) {
+                //hide the shown data first
+                $('#residentInformation').hide();
+                //create name variable
+                let newName = ((data.name).toString()).split(' ').join('_');
+                //create form to enter, change and show the data
+                $('#editInformation').html(
+                '<form>'
+                + 'Name: <input type=\"text\" id=\"editName\" value=\"' + newName.split('_').join(' ') + '\" />'
+                + 'Room Number: <input type=\"integer\" id=\"editRoom\" value=\"' + data.room + '\" />'
+                + '<button onclick=\"editFunction()\">Submit</button>'
+                + '</form>'
+                );
+              } else {
+                console.log("Edit error");
+              }
+            }
+          });
+        });
 
+        document.getElementById("refreshTable").click();
+        $('#residentOptions').hide();
 
         let coll = document.getElementsByClassName("collapsible");
         let i;
@@ -110,55 +139,115 @@
           coll[i].click();
         }
 
-        clickRespond = (clicked_id) => {
-          const resName = document.getElementById(clicked_id).innerText;
-          const requestURL = 'king/' + resName;
-          console.log('Making request to: ', requestURL);
-          $.ajax({
-            url: requestURL,
-            type: 'GET',
-            dataType: 'json',
-            success: (data) => {
-              if (data.name && data.room && data.floor && data.route) {
-                $('#name').html('Resident Name: ' + data.name);
-                $('#room').html('Room is: ' + data.room);
-                $('#floor').html('Floor is: ' + data.floor);
-                $('#deleteButton').html('Remove Resident From Database');
-                let element = document.getElementById('deleteButton');
-                let cname = element.className;
-                document.getElementById('deleteButton').classList.add(resName.split(' ').join('_'));
-                document.getElementById('deleteButton').classList.remove(cname);
-              } else {
-                $('#name').html('Name and/or');
-                $('#room').html('room is unknown.');
-              }
-            }
-          });
-        }
       });
 
+      tableRespond = (clicked_id) => {
+        const resName = document.getElementById(clicked_id).innerText;
+        residentInfo(resName);
+      };
+
+      residentInfo = (resName) => {
+        const requestURL = 'king/' + resName;
+        $.ajax({
+          url: requestURL,
+          type: 'GET',
+          dataType: 'json',
+          success: (data) => {
+            if (data.name && data.room && data.floor && data.route) {
+              //write info on page
+              $('#name').html('Resident Name: ' + data.name);
+              $('#room').html('Room is: ' + data.room);
+              $('#floor').html('Floor is: ' + data.floor);
+              $('#deleteButton').html('Remove Resident From Database');
+              $('#editButton').html('Edit Resident Information');
+              //show resident options to edit or delete
+              $('#residentOptions').show();
+              //update the saved name and room
+              updateSaved(resName, data.room);
+            } else {
+              $('#name').html('Name and/or');
+              $('#room').html('room is unknown.');
+            }
+          }
+        });
+      }
+
+      editFunction = () => {
+        const requestURL = 'king/edit/name';
+        const newName = (document.getElementById('editName')).value;
+        const newRoom = (document.getElementById('editRoom')).value;
+        const thisName = (document.getElementById('saveName')).className;
+        const oldRoom = (document.getElementById('saveRoom')).className;
+        let oldName;
+        let i = 0;
+        let cnt = 0;
+        for (i = 0; i < thisName.length; i++) {
+          if (thisName[i] === '_') {
+            cnt = 1;
+          }
+        }
+        if (cnt = 1) {
+          oldName = thisName.split('_').join(' ');
+        } else {
+          oldName = thisName;
+        }
+        $.ajax({
+          url: requestURL,
+          type: 'POST',
+          data: jQuery.param({
+              newName: newName,
+              newRoom: newRoom,
+              //need old info to identify resident
+              oldName: oldName,
+              oldRoom: oldRoom
+            }),
+          success: (response) => {
+            updateSaved(newName, newRoom);
+            document.getElementById("refreshTable").click();
+            $('#editInformation').hide();
+            $('#residentInformation').show();
+          }
+        });
+/*
+        document.getElementById("refreshTable").click();
+        $('#editInformation').hide();
+        $('#residentInformation').show();*/
+      }
+
+      updateSaved = (resName, resRoom) => {
+        //update the saved name for other uses on the page
+        let namesave = document.getElementById('saveName');
+        let savedName = namesave.className;
+        if (savedName !== resName) {
+          document.getElementById('saveName').classList.add(resName.split(' ').join('_'));
+          document.getElementById('saveName').classList.remove(savedName);
+        } else {
+          console.log("Multiple clicks or same name.");
+        }
+        //update the saved room for other uses on the page
+        let room = document.getElementById('saveRoom');
+        let savedRoom = room.className;
+        if (savedRoom !== resRoom) {
+          document.getElementById('saveRoom').classList.add(resRoom);
+          document.getElementById('saveRoom').classList.remove(savedRoom);
+        } else {
+          console.log("Multiple clicks or same room.");
+        }
+      }
     </script>
-
-    <style>
-
-    table,
-    td {
-      border: 1px solid #333;
-    }
-
-    </style>
-
   </head>
   <body>
 
-    <h1>King Street</h1>
+    <h1 class="text-center">King Street</h1>
 
-    <button id="find" class="collapsible">Find A Resident</button>
-    <div class="content">
-      Name: <input id="nameBox" type="text" size="20"/>
-      <button id="getProfile">Get Profile<button>
-    </div>
+    <!--div to save the name of the resident-->
+    <div id="saveName" class="empty"></div>
+    <div id="saveRoom" class="empty"></div>
 
+    <input id="nameBox" type="text" size="20" value="Search for Resident"/>
+    <button id="getProfile">Search</button>
+    <br>
+    <br>
     <button id="add" class="collapsible">Add A Resident</button>
     <div class="content">
       Name: <input id="insertName" type="text" size="20"/>
@@ -166,19 +255,25 @@
       <button id="insertButton">Insert Into Database</button>
     </div>
 
-    <div>
+    <div id="residentInformation">
       <p id="name"></p>
       <p id="room"></p>
       <p id="floor"></p>
       <p id="route"></p>
-      <button id="deleteButton" class="empty"></button>
+      <div id="residentOptions">
+        <button id="editButton"></button>
+        <button id="deleteButton"></button>
+      </div>
     </div>
 
-    <div class="container">
+    <div id="editInformation"></div>
+
+    <div>
       <button id="refreshTable">Refresh Table</button>
       <h3>Residents On King St.<h3>
-      <table id="table" class="table table-striped"></table>
+      <table id="table"></table>
     </div>
+
 
   </body>
 </html>

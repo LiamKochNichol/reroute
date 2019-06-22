@@ -1,20 +1,19 @@
 {
-  "name": "dementia-project",
+  "name": "reroute",
   "version": "1.0.0",
-  "description": "server _attempt",
-  "main": "Server.js",
+  "description": "User interface for resident notifications",
+  "main": "database.js",
   "scripts": {
-    "test": "run server.js",
+    "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "author": "Liam Koch Nichol",
+  "author": "",
   "license": "MIT",
   "dependencies": {
-    "bluebird": "^3.5.5",
     "bootstrap": "^4.3.1",
-    "express": "^4.17.0",
+    "express": "^4.17.1",
     "jquery": "^3.4.1",
-    "sqlite3": "^4.0.8",
-    "xmlhttprequest": "^1.8.0"
+    "popper.js": "^1.15.0",
+    "sqlite3": "^4.0.9"
   }
 }
