@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <!--For Bootstrap -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css" />
+
+  <title>SETUP</title>
+
+  <script type="text/javascript">
+
+    $(document).ready(() => {
+
+      $('#setHome').hide();
+      $('#setFloor').hide();
+
+      $('#newHome').click(() => {
+        $('#newHomeButton').hide();
+        $('#setHome').show();
+      });
+
+      $('#newFloor').click(() => {
+        $('#newFloorButton').hide();
+        $('#setFloor').show();
+      });
+
+      $('#submitHome').click(() => {
+        let homeName = $('#homeName').val();
+        let homePass = $('#homePass').val();
+        $.ajax({
+          url: 'submitHome',
+          type: 'POST',
+          data: jQuery.param({
+              name: homeName,
+              password: homePass
+            }),
+          success: (response) => {
+            console.log(response);
+          }
+        });
+      });
+
+      $('#submitFloor').click(() => {
+        let homeName = $('#nameOfHome').val();
+        let homePass = $('#passOfHome').val();
+        let floorName = $('#floorName').val();
+        let start = $('#startNumber').val();
+        let stop = $('#stopNumber').val();
+        let mapfile = $('#mapfile').val();
+        $.ajax({
+          url: 'submitFloor',
+          type: 'POST',
+          data: jQuery.param({
+              homeName: homeName,
+              homePass: homePass,
+              floorName: floorName,
+              start: start,
+              stop: stop,
+              mapfile: mapfile
+            }),
+          success: (response) => {
+            console.log(response);
+          }
+        });
+      });
+
+    });
+
+
+  </script>
+
+</head>
+
+<body>
+
+  <div>
+    <div id="newHomeButton">
+     <button id="newHome">Create New Home</button>
+    </div>
+    <div id="setHome">
+      Nursing Home Name: <input id="homeName" type="text" size="20" />
+      Password: <input id="homePass" type="text" size="20" />
+      <button id="submitHome">Submit Home</button>
+    </div>
+  </div>
+
+  <div>
+    <div id="newFloorButton">
+      <button id="newFloor">Create New Floor</button>
+    </div>
+    <div id="setFloor">
+      Nursing Home Name: <input id="nameOfHome" type="text" size="20" />
+      <br>
+      Password: <input id="passOfHome" type="text" size="20" />
+      <br>
+      Floor Name: <input id="floorName" type="text" size="20" />
+      <br>
+      Room Starting Number: <input id="startNumber" type="number" size="20" />
+      <br>
+      Room Stopping Number: <input id="stopNumber" type="number" size="20" />
+      <br>
+      Mapfile Name: <input id="mapfile" type="text" size="20" />
+      <br>
+      <button id="submitFloor">Submit Floor</button>
+    </div>
+  </div>
+
+  <div id="setUp"></div>
+
+<body>
+</html>

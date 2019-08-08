@@ -1,87 +1,80 @@
 <!DOCTYPE html>
 <head>
-<title> Fairview Nursing Home </title>
-</head>
+  <title>Reroute</title>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <!--jquery-->
+  <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+  <!--For Bootstrap -->
+  <link rel="stylesheet" href="/css/bootstrap.min.css" />
 
-<style>
-.kingbutton {
-    background-color: #f2cbbf; /* Peach */
-    border: none;
-    border-radius: 8px;
-    width: 550px;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 110px;
-    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
-    text-shadow: -5px 7px 19px rgba(0,0,0,0.35);
-}
-.queenbutton {
-    background-color: #9bdbd5; /* Teal */
-    border: none;
-    border-radius: 8px;
-    width: 550px;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 110px;
-    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
-    text-shadow: -5px 7px 19px rgba(0,0,0,0.35);
-}
-.dundasbutton {
-    background-color: #d1c6ef; /* Lavender */
-    border: none;
-    border-radius: 8px;
-    width: 550px;
-    color: white;
-    padding: 15px 32px;
-    text-align: center;
-    text-decoration: none;
-    display: inline-block;
-    font-size: 110px;
-    box-shadow: 0 6px 8px 0 rgba(0,0,0,0.24), 0 9px 25px 0 rgba(0,0,0,0.19);
-    text-shadow: -5px 7px 19px rgba(0,0,0,0.35);
-}
-.shadow:hover {
-    box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24), 0 17px 50px 0 rgba(0,0,0,0.19);
-}
-body {
-    background-color: rgb(150,150,150,0.05);
-    font-family: Arial, Helvetica, sans-serif;
-}
-</style>
+  <link rel="stylesheet" href="/static/stylesheet.css" />
+
+  <script type="text/javascript">
+
+    $(document).ready(() => {
+
+      $('#login').hide();
+
+      $('#loginButton').click(() => {
+        const home = $('#insertHome').val();
+        const pass = $('#insertPassword').val();
+        $.ajax({
+          url: 'login',
+          type: 'GET',
+          data: jQuery.param({
+              home: home,
+              pass: pass,
+            }),
+          success: (data) => {
+            if (data.pass ===  "no") {
+              console.log("Login Started");
+              alert("Login Failed: Please make sure you are entering correct information.");
+            } else if (data.pass === "yes"){
+              console.log("Login Success");
+              window.location.href = 'http://localhost:4001/floors?id=*' + data.id.id + '*?name=*' + home + '*';
+            } else {
+              console.log("Something weird happened");
+            }
+          }
+        });
+      });
+
+      $('#loginForm').click(() => {
+        $('#login').toggle();
+      });
+
+    });
+
+    routeFunction = (home) => {
+      requestURL = 'reroute/' + home;
+      $.ajax({
+        url: requestURL,
+        type: 'GET',
+        success: (data) => {
+          console.log("yeah");
+        }
+      })
+    }
+
+  </script>
+</head>
 
 <body>
 
-<div style="margin: auto;position: absolute; top: -400px ; left: 425px; bottom: 0; right: 0; height: 170px;">
-    <div>
-      <a href="king">
-        <button class"kingbutton">King</button>
-      </a>
-    </div>
+  <button id="loginForm" class="button loginFormButton">Log In</button>
 
-    <br>
-    <br>
+  <div id="login" class="loginForm">
+    Nursing Home: <input id="insertHome" type="text" size="20" class="form-control"/>
+    Password: <input id="insertPassword" type="text" size="20" class="form-control" />
+    <button id="loginButton" class="btn btn-light">Enter</button>
+  </div>
 
-    <div>
-      <a href="queen">
-        <button class"queenbutton shadow">Queen</button>
-      </a>
-    </div>
+  <br>
+  <br>
+  <br>
 
-    <br>
-    <br>
-
-    <div>
-      <a href="dundas">
-        <button class"dundasbutton shadow">Dundas</button>
-      </a>
-    </div>
-</div>
+  <img src="images/frontlogo.png">
 
 </body>
 

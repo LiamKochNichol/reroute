@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <!--For Bootstrap -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" />
+
+    <title>Floor Page</title>
+
+    <script type="text/javascript">
+
+      $(document).ready(() => {
+        //get web address for passed parameters
+        let url = window.location.href
+        //get id number and home name from url
+        let parameterArray = url.split("*");
+        console.log(parameterArray);
+        let homeId = parameterArray[1];
+        let homeName = parameterArray[3];
+        console.log("HomeID: " + homeId + " HomeName: " + homeName);
+
+        //to create the buttons of the floors in the home
+        $.ajax({
+          url: 'getFloors',
+          type: 'GET',
+          data: jQuery.param({
+              id: homeId
+            }),
+          success: (res) => {
+            console.log(res);
+            console.log(homeId);
+            //set accumulator to write html buttons
+            let accum = ''
+            $.each(res, (index, value) => {
+              console.log(value.floorName);
+              accum = accum + '<button id=\"*' + homeName + '*' + value.floorName + '*\" onclick=\"floorDirect(this.id,' + homeId + ')\" type=\"button\" class=\"btn btn-outline-secondary\">' + value.floorName + '</button><br>';
+            });
+            //put button code into html div
+            $('#buttons').html(accum);
+          }
+        });
+      });
+      //function to direct to the correct floor
+      floorDirect = (tableName, homeId) => {
+        //use * character for parsing data on floor page
+        window.location.href = 'http://localhost:4001/thisFloor?' + tableName + '/id?*' + homeId;
+      };
+
+
+    </script>
+
+  </head>
+
+  <body>
+
+    <div id="buttons"></div>
+
+  </body>
+</html>

@@ -1,0 +1,440 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+    <!--For Bootstrap -->
+    <link rel="stylesheet" href="/css/bootstrap.min.css" /> <!--For Map Functionality -->
+    <script src="node_modules/raphael/raphael.js"></script>
+    <script src="node_modules/jquery-mapael/js/jquery.mapael.js"></script>
+    <script src="node_modules/jquery-mapael/js/maps/newtestfloorplan.js"></script>
+
+    <title>Community Floor</title>
+
+    <script type="text/javascript">
+
+      $(document).ready(() => {
+
+        let url = window.location.href;
+        console.log(url);
+        let parameterArray = url.split("*");
+        let tableName = parameterArray[1] + parameterArray[2];
+        let nursingHomeName = parameterArray[1];
+        let homeFloorName = parameterArray[2];
+        let theHomeId = parameterArray[4];
+
+        $('#title').html('<h1 class="text-center">' + homeFloorName + '</h1>');
+        $('#tableTitle').html('<h3 class="text-center">Residents On ' + homeFloorName + '</h3>');
+
+        $('#getProfile').click(() => {
+          let resName = $('#nameBox').val();
+          residentInfo(resName);
+        });
+
+        $('#refreshTable').click(() => {
+          $.ajax({
+            url: 'getFloorResidents/' + tableName,
+            type: 'GET',
+            dataType: 'text',
+            success: (data) => {
+              data = JSON.parse(data);
+              let html = '';
+              html += '<tr>';
+              let flag = 0;
+              $.each(data[0], (index, value) => {
+                if (index === 'id' || index === 'floor' || index === 'homeId') {
+                  html += '';
+                } else {
+                  html += '<th>' + index.toUpperCase() +'</th>';
+                }
+              });
+              html += '</tr>';
+              $.each(data, (index, value) => {
+                html += '<tr>';
+                $.each(value, (index2, value2) => {
+                  if (value2 === null) {
+                    html += '<td>NULL</td>';
+                  } else if (index2 === 'id' || index2 === 'floor' || index2 === 'homeId') {
+                    html += '';
+                  } else if (index2 === 'name') {
+                    let i = 0;
+                    let cnt = 0;
+                    for (i = 0; i < value2.length; i++) {
+                      if (value2[i] === ' ') {
+                        cnt = 1;
+                      }
+                    }
+                    if (cnt === 1) {
+                      html += '<td><button id = ' + value2.replace(/\s/g, '') + ' onClick="residentInfo(this.id)" type="button" class="btn btn-outline-secondary">' + value2 + '</button></td>';
+                    } else {
+                      html += '<td><button id = ' + value2 + ' onClick="residentInfo(' + value.id + ')" type="button" class="btn btn-outline-secondary">' + value2 + '</button></td>';
+                    }
+                  } else {
+                    html += '<td>'+value2+'</td>';
+                  }
+                });
+                html += '<tr>';
+              });
+              $('#table').html(html);
+            }
+          });
+        });
+
+        $('#insertButton').click(() => {
+          const name = $('#insertName').val();
+          const room = $('#insertRoom').val();
+          $.ajax({
+            url: 'inputResident/' + tableName,
+            type: 'POST',
+            data: {
+              name: name,
+              room: room,
+              homeId: theHomeId,
+            },
+            success: (data) => {
+              document.getElementById("refreshTable").click();
+              updateSaved(data, name, room);
+              $('#addResident').hide();
+            }
+          });
+        });
+
+        $('#deleteButton').click(() => {
+          let ele = document.getElementById('saveId');
+          let resId = ele.className;
+          $.ajax({
+            url: 'deleteResident',
+            type: 'POST',
+            data: jQuery.param({
+                id: resId,
+                tableName: tableName,
+              }),
+            success: (response) => {
+              console.log('Delete request success');
+              $('#residentInformation').hide();
+              document.getElementById("refreshTable").click();
+            }
+          });
+        });
+
+        $('#editButton').click(() => {
+          let ele = document.getElementById('saveId');
+          let resId = ele.className;
+          requestURL = 'requestResidentInfo/' + resId;
+          $.ajax({
+            url: requestURL,
+            type: 'GET',
+            dataType: 'json',
+            success: (data) => {
+              if (data.name && data.room && data.floor) {
+                //hide the shown data first
+                $('#residentInformation').hide();
+                $('#addResident').hide();
+                //create name variable
+                let newName = ((data.name).toString()).split(' ').join('_');
+                //create form to enter, change and show the data
+                $('#editInformation').html(
+                + '<h3>Edit Data</h3>'
+                + 'Name: <input type=\"text\" id=\"editName\" value=\"' + newName.split('_').join(' ') + '\" />'
+                + 'Room Number: <input type=\"integer\" id=\"editRoom\" value=\"' + data.room + '\" />'
+                + '<button onclick=\"editFunction()\" class="btn btn-outline-dark">Submit</button>'
+                );
+                $('#editInformation').show();
+                document.getElementById("refreshTable").click();
+              } else {
+                console.log("Edit error");
+              }
+            }
+          });
+        });
+
+        document.getElementById("refreshTable").click();
+        $('#residentInformation').hide();
+        $('#addResident').hide();
+
+        $('#add').click(() => {
+          $('#addResident').toggle();
+          $('#editInformation').hide();
+        });
+
+        residentInfo = (resId) => {
+          const requestURL = 'requestResidentInfo/' + resId;
+          $.ajax({
+            url: requestURL,
+            type: 'GET',
+            dataType: 'json',
+            success: (data) => {
+              if (data.id && data.name && data.room && data.floor) {
+                //write info on page
+                $('#name').html('Resident Name: ' + data.name);
+                $('#room').html('Room is: ' + data.room);
+                $('#floor').html('Floor is: ' + homeFloorName);
+                $('#deleteButton').html('Remove Resident From Database');
+                $('#editButton').html('Edit Resident Information');
+                //show resident options to edit or delete
+                $('#residentInformation').show();
+                //update the saved name and room
+                updateSaved(data.id, data.name, data.room);
+                //show map of floor
+                mapIt(tableName);
+              } else {
+                $('#name').html('Name and/or');
+                $('#room').html('room is unknown.');
+              }
+            }
+          });
+        }
+
+      });
+
+
+      editFunction = () => {
+        console.log("EDIT FUNCTION STARTED");
+        const requestURL = 'editResident';
+        const newName = (document.getElementById('editName')).value;
+        const newRoom = (document.getElementById('editRoom')).value;
+        const thisName = (document.getElementById('saveName')).className;
+        const oldRoom = (document.getElementById('saveRoom')).className;
+        const resId = (document.getElementById('saveId')).className;
+        let oldName;
+        let i = 0;
+        let cnt = 0;
+        for (i = 0; i < thisName.length; i++) {
+          if (thisName[i] === '_') {
+            cnt = 1;
+          }
+        }
+        if (cnt = 1) {
+          oldName = thisName.split('_').join(' ');
+        } else {
+          oldName = thisName;
+        }
+        $.ajax({
+          url: requestURL,
+          type: 'POST',
+          data: jQuery.param({
+              newName: newName,
+              newRoom: newRoom,
+              //need old info to identify resident
+              oldName: oldName,
+              oldRoom: oldRoom,
+            }),
+          success: (response) => {
+            updateSaved(resId, newName, newRoom);
+            document.getElementById("refreshTable").click();
+            $('#editInformation').hide();
+            $('#residentInformation').show();
+          }
+        });
+      }
+
+      updateSaved = (resId, resName, resRoom) => {
+        //update the id for other uses on the page
+        let idSave = document.getElementById('saveId');
+        let saveId = idSave.className;
+        console.log(saveId + resId);
+        if (saveId != resId) {
+          document.getElementById('saveId').classList.add(resId);
+          document.getElementById('saveId').classList.remove(saveId);
+        } else {
+          console.log("Multiple clicks: same id");
+        }
+        //update the saved name for other uses on the page
+        let namesave = document.getElementById('saveName');
+        let savedName = namesave.className;
+        if (savedName != resName) {
+          document.getElementById('saveName').classList.add(resName.split(' ').join('_'));
+          document.getElementById('saveName').classList.remove(savedName);
+        } else {
+          console.log("Multiple clicks or same name.");
+        }
+        //update the saved room for other uses on the page
+        let room = document.getElementById('saveRoom');
+        let savedRoom = room.className;
+        if (savedRoom != resRoom) {
+          document.getElementById('saveRoom').classList.add(resRoom);
+          document.getElementById('saveRoom').classList.remove(savedRoom);
+        } else {
+          console.log("Multiple clicks or same room.");
+        }
+      }
+
+      mapIt = (floor) => {
+        console.log("MAPIT INITIATED");
+        //get the proper rooms
+        let layout;
+        let ele = document.getElementById('saveId');
+        let resID = ele.className;
+        let requestURL = 'mapIt/' + resID + '/' + floor;
+        console.log(requestURL)
+        $.ajax({
+          url: requestURL,
+          type: 'GET',
+          data: 'json',
+          success: (data) => {
+            let myAreas = {};
+            $.each(data, (index, val) => {
+              if (index === 'id') {
+                console.log('ID hit up');
+              } else {
+                let colour;
+                if (val === 0) {
+                  colour = '#FF0000';
+                } else if (val === 1) {
+                  colour = '#00ff00';
+                } else if (val === 2) {
+                  colour = '#C0C0C0';
+                } else {
+                  console.log('Colour Error');
+                }
+                myAreas[index] = {
+                  value: index,
+                  attrs: {
+                    "fill": colour,
+                  },
+                  text: {
+                    content: index.replace('room', ''),
+                    attrs: {
+                      "fill": '#FFFFFF',
+                      "font-size" : 5
+                    }
+                  }
+                }
+              }
+            });
+            mapOn(myAreas, floor);
+          }
+        });
+      }
+
+      mapOn = (myAreas, floor) => {
+        console.log(myAreas);
+        $(".floorContainer").mapael({
+          map : {
+            name : "newtestfloorplan",
+            defaultArea: {
+              attrs: {
+                fill: '#C0C0C0',
+                stroke: "#FFFFFF",
+                "stroke-width": 1
+              },
+              attrsHover: {
+                "stroke-width": 2,
+                fill: "#D8D8D8"
+              },
+              eventHandlers: {
+                click: function (e, id, mapElem, textElem) {
+                  console.log(myAreas[id].value);
+                  let newData = {
+                    'areas': {}
+                  };
+                  if (mapElem.originalAttrs.fill == "#FF0000") {
+                    roomUpdate(myAreas[id].value, 1, floor);
+                    newData.areas[id] = {
+                      attrs: {
+                        fill: "#00ff00"
+                      }
+                    };
+                  } else if (mapElem.originalAttrs.fill == "#00ff00") {
+                    roomUpdate(myAreas[id].value, 2, floor);
+                    newData.areas[id] = {
+                      attrs: {
+                        fill: "#C0C0C0"
+                      }
+                    };
+                  } else {
+                    roomUpdate(myAreas[id].value, 0, floor);
+                    newData.areas[id] = {
+                      attrs: {
+                        fill: "#FF0000"
+                      }
+                    };
+                  }
+                  $(".floorContainer").trigger('update', [{mapOptions: newData}]);
+                }
+              }
+            }
+          },
+          areas : myAreas
+        });
+      }
+
+      roomUpdate = (room, route, floor) => {
+        let ele = document.getElementById('saveId');
+        let resID = ele.className;
+        $.ajax({
+          url: 'updateRoom/' + floor,
+          type: 'POST',
+          data: jQuery.param({
+              resId: resID,
+              room: room,
+              routeSetting: route,
+            }),
+          success: (response) => {
+            console.log('Update Success')
+          }
+        });
+      }
+
+    </script>
+
+  </head>
+  <body>
+
+    <div id="title"></div>
+
+    <!--div to save the name of the resident-->
+    <div id="saveId" class="empty"></div>
+    <div id="saveName" class="empty"></div>
+    <div id="saveRoom" class="empty"></div>
+
+    <div class="form-group">
+      <input id="nameBox" type="text" size="20" value="Search for Resident" class="col-6 col-md-4 form-control"/>
+      <button id="getProfile" type="button" class="btn btn-light">Search</button>
+    </div>
+    <br>
+
+    <button id="add" type="button" class="btn btn-outline-dark">Add A Resident</button>
+    <div id="addResident" class="form-group">
+      <!--Id: <input id="insertId" type="number" size="20"/>-->
+      Name: <input id="insertName" type="text" size="20" class="form-control"/>
+      Room: <input id="insertRoom" type="number" size="20" class="form-control" />
+      <button id="insertButton" class="btn btn-light">Insert Into Database</button>
+    </div>
+
+    <br>
+
+    <div id="residentInformation" class="mx-auto">
+      <p id="name"></p>
+      <p id="room"></p>
+      <p id="floor"></p>
+      <p id="route"></p>
+      <div id="residentOptions">
+        <button id="editButton" class="btn btn-outline-dark"></button>
+        <button id="deleteButton" class="btn btn-outline-dark"></button>
+      </div>
+      <div class="floorContainer">
+        <div class="map">
+          <span>Floor Plan</span>
+        </div>
+        <div class="row">
+          <div class=" col-4 p-3 mb-2 bg-success text-white">Allowed - Alerts Off</div>
+          <div class=" col-4 p-3 mb-2 bg-danger text-white">Not Allowed - Alerts On</div>
+          <div class="col-4 p-3 mb-2 bg-light text-dark">Undefined Area</div>
+        </div>
+      </div>
+    </div>
+
+    <br>
+
+    <div id="editInformation"></div>
+
+    <div>
+      <button id="refreshTable" type="button" class="btn btn-dark btn-sm">Refresh Table</button>
+      <div id="tableTitle"></div>
+      <table id="table" class="w-75 mx-auto table table-bordered table-striped"></table>
+    </div>
+
+  </body>
+</html>
