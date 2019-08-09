@@ -5,6 +5,11 @@ const sqlite3 = require('sqlite3');
 const db = new sqlite3.Database('residents.db');
 const PORT = process.env.PORT || 4001;
 const bodyParser = require('body-parser');
+const compression = require('compression');
+const helmet = require('helmet');
+
+app.use(helmet());
+app.use(compression());
 app.use(bodyParser.urlencoded({extended: true}));
 app.use(express.static(path.join(__dirname, 'Dementia Project')));
 app.use('/css', express.static(__dirname + '/node_modules/bootstrap/dist/css'));
