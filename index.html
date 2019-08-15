@@ -7,8 +7,8 @@
   <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
   <!--For Bootstrap -->
   <link rel="stylesheet" href="/css/bootstrap.min.css" />
-
-  <link rel="stylesheet" href="/static/stylesheet.css" />
+  <!--For CSS -->
+  <link rel="stylesheet" type="text/css" href="/static/stylesheet.css" />
 
   <script type="text/javascript">
 
@@ -32,7 +32,7 @@
               alert("Login Failed: Please make sure you are entering correct information.");
             } else if (data.pass === "yes"){
               console.log("Login Success");
-              window.location.href = 'http://localhost:4001/floors?id=*' + data.id.id + '*?name=*' + home + '*';
+              window.location.href = '/floors?id=*' + data.id.id + '*?name=*' + home + '*';
             } else {
               console.log("Something weird happened");
             }
@@ -42,6 +42,10 @@
 
       $('#loginForm').click(() => {
         $('#login').toggle();
+      });
+
+      $('#demoButton').click(() => {
+        window.location.href = '/demo';
       });
 
     });
@@ -67,7 +71,7 @@
   <div id="login" class="loginForm">
     Nursing Home: <input id="insertHome" type="text" size="20" class="form-control"/>
     Password: <input id="insertPassword" type="text" size="20" class="form-control" />
-    <button id="loginButton" class="btn btn-light">Enter</button>
+    <button id="loginButton" class="button loginEnterButton">Enter</button>
   </div>
 
   <br>
@@ -75,6 +79,59 @@
   <br>
 
   <img src="images/frontlogo.png">
+
+  <div class="space"></div>
+
+  <div class="colorLeft">
+    <h3 class="leftColor">What It Is</h3>
+    <p class="leftColor">
+      Reroute is a notification system developed for nursing homes
+      struggling with wandering residents. These residents may have
+      Alzheimer's or dementia, and frequently disterb other residents
+      and staff by walking into areas of the nursing home they shoudn't
+      be in. Reroute alerts staff when a resident walks into an unwanted
+      area.
+    </p>
+    <p class="leftColor">
+      This project is still in development, but it could offer staff a method
+      of adressing wandering quickly and effectively. Nursing home staff know
+      each resident best, and it's important for each wandering incident to be
+      taken care of by someone who knows the resident and nursing home
+      operations.
+    </p>
+  </div>
+  <div class="colorRight">
+    <h3 class="rightColor">How It Works</h3>
+    <p class="rightColor">
+      The system uses existing routers in the building and a small chip
+      that can be clipped on the resident's clothing to locate where they
+      are in the building. Then if the resident is in a restricted location,
+      an alert is sent to notify the staff.
+    </p>
+    <p class="rightColor">
+      On this site, residents can be managed. Each nursing home can
+      have a number of floors or community sections, and residents
+      may be added, deleted and edited from their section. Additionally,
+      individual rooms may be selected to allow or restrict residents
+      from entering specific rooms.
+    </p>
+    <p class="rightColor">
+      If you are interested about managing residents, please take a look
+      at the demo below.
+    </p>
+  </div>
+
+  <div class="space"></div>
+
+  <button id="demoButton" class="invbutton demoButton">Click For Demonstration</button>
+
+  <div class="space"></div>
+
+  <div class="email">
+    <p class="rightColor">To contact, please email
+    <a href="mailto:reroute.technology@gmail.com" class="rightColor">reroute.technology@gmail.com</a>
+    </p>
+  </div>
 
 </body>
 

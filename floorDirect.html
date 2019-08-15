@@ -7,6 +7,9 @@
     <!--For Bootstrap -->
     <link rel="stylesheet" href="/css/bootstrap.min.css" />
 
+    <!--For CSS -->
+    <link rel="stylesheet" href="/static/stylesheet.css" />
+
     <title>Floor Page</title>
 
     <script type="text/javascript">
@@ -32,11 +35,12 @@
             console.log(res);
             console.log(homeId);
             //set accumulator to write html buttons
-            let accum = ''
+            let accum = '<div class=\"floorContainer\"><br>'
             $.each(res, (index, value) => {
               console.log(value.floorName);
-              accum = accum + '<button id=\"*' + homeName + '*' + value.floorName + '*\" onclick=\"floorDirect(this.id,' + homeId + ')\" type=\"button\" class=\"btn btn-outline-secondary\">' + value.floorName + '</button><br>';
+              accum = accum + '<button id=\"*' + homeName + '*' + value.floorName + '*\" onclick=\"floorDirect(this.id,' + homeId + ')\" type=\"button\" class=\"invbutton floorButton\">' + value.floorName + '</button><br><br>';
             });
+            accum = accum + '</div>'
             //put button code into html div
             $('#buttons').html(accum);
           }
@@ -45,7 +49,7 @@
       //function to direct to the correct floor
       floorDirect = (tableName, homeId) => {
         //use * character for parsing data on floor page
-        window.location.href = 'http://localhost:4001/thisFloor?' + tableName + '/id?*' + homeId;
+        window.location.href = '/thisFloor?' + tableName + '/id?*' + homeId;
       };
 
 

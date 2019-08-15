@@ -3,14 +3,14 @@
   "version": "1.0.0",
   "engines": {
     "node": "11.13.0"
-  },
+  }
   "description": "User interface for resident notifications",
   "main": "database.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node server.js"
   },
-  "author": "Liam Koch Nichol",
+  "author": "",
   "license": "MIT",
   "dependencies": {
     "bootstrap": "^4.3.1",

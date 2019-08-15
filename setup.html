@@ -28,6 +28,7 @@
       $('#submitHome').click(() => {
         let homeName = $('#homeName').val();
         let homePass = $('#homePass').val();
+        let email = $('#email').val();
         $.ajax({
           url: 'submitHome',
           type: 'POST',
@@ -81,6 +82,7 @@
     <div id="setHome">
       Nursing Home Name: <input id="homeName" type="text" size="20" />
       Password: <input id="homePass" type="text" size="20" />
+      Email: <input id="email" type="text" size="20" />
       <button id="submitHome">Submit Home</button>
     </div>
   </div>

@@ -9,8 +9,10 @@
     <script src="node_modules/raphael/raphael.js"></script>
     <script src="node_modules/jquery-mapael/js/jquery.mapael.js"></script>
     <script src="node_modules/jquery-mapael/js/maps/newtestfloorplan.js"></script>
+    <!--For CSS -->
+    <link rel="stylesheet" href="/static/stylesheet.css" />
 
-    <title>Community Floor</title>
+    <title>Floor</title>
 
     <script type="text/javascript">
 
@@ -25,7 +27,8 @@
         let theHomeId = parameterArray[4];
 
         $('#title').html('<h1 class="text-center">' + homeFloorName + '</h1>');
-        $('#tableTitle').html('<h3 class="text-center">Residents On ' + homeFloorName + '</h3>');
+        $('#tableTitle').html('<h3>Residents On ' + homeFloorName + '</h3>');
+        $('#refresh').hide();
 
         $('#getProfile').click(() => {
           let resName = $('#nameBox').val();
@@ -66,9 +69,9 @@
                       }
                     }
                     if (cnt === 1) {
-                      html += '<td><button id = ' + value2.replace(/\s/g, '') + ' onClick="residentInfo(this.id)" type="button" class="btn btn-outline-secondary">' + value2 + '</button></td>';
+                      html += '<td><button id = ' + value2.replace(/\s/g, '') + ' onClick="residentInfo(' + value.id + ')" type="button" class="invbutton residentButton">' + value2 + '</button></td>';
                     } else {
-                      html += '<td><button id = ' + value2 + ' onClick="residentInfo(' + value.id + ')" type="button" class="btn btn-outline-secondary">' + value2 + '</button></td>';
+                      html += '<td><button id = ' + value2 + ' onClick="residentInfo(' + value.id + ')" type="button" class="invbutton residentButton">' + value2 + '</button></td>';
                     }
                   } else {
                     html += '<td>'+value2+'</td>';
@@ -135,10 +138,12 @@
                 let newName = ((data.name).toString()).split(' ').join('_');
                 //create form to enter, change and show the data
                 $('#editInformation').html(
+                '<div class="resInfo">'
                 + '<h3>Edit Data</h3>'
                 + 'Name: <input type=\"text\" id=\"editName\" value=\"' + newName.split('_').join(' ') + '\" />'
                 + 'Room Number: <input type=\"integer\" id=\"editRoom\" value=\"' + data.room + '\" />'
-                + '<button onclick=\"editFunction()\" class="btn btn-outline-dark">Submit</button>'
+                + '<button onclick=\"editFunction()\" class="invbutton normal">Submit</button>'
+                + '</div>' + '<div class="space"></div>'
                 );
                 $('#editInformation').show();
                 document.getElementById("refreshTable").click();
@@ -389,30 +394,25 @@
     <div id="saveName" class="empty"></div>
     <div id="saveRoom" class="empty"></div>
 
-    <div class="form-group">
-      <input id="nameBox" type="text" size="20" value="Search for Resident" class="col-6 col-md-4 form-control"/>
-      <button id="getProfile" type="button" class="btn btn-light">Search</button>
-    </div>
-    <br>
 
-    <button id="add" type="button" class="btn btn-outline-dark">Add A Resident</button>
-    <div id="addResident" class="form-group">
+    <button id="add" class="invbutton normal">Add A Resident</button>
+    <div id="addResident" class="loginForm">
       <!--Id: <input id="insertId" type="number" size="20"/>-->
       Name: <input id="insertName" type="text" size="20" class="form-control"/>
       Room: <input id="insertRoom" type="number" size="20" class="form-control" />
-      <button id="insertButton" class="btn btn-light">Insert Into Database</button>
+      <button id="insertButton" class="invbutton normal">Insert Into Database</button>
     </div>
 
     <br>
 
-    <div id="residentInformation" class="mx-auto">
+    <div id="residentInformation" class="resInfo">
       <p id="name"></p>
       <p id="room"></p>
       <p id="floor"></p>
       <p id="route"></p>
       <div id="residentOptions">
-        <button id="editButton" class="btn btn-outline-dark"></button>
-        <button id="deleteButton" class="btn btn-outline-dark"></button>
+        <button id="editButton" class="invbutton normal"></button>
+        <button id="deleteButton" class="invbutton normal"></button>
       </div>
       <div class="floorContainer">
         <div class="map">
@@ -431,7 +431,9 @@
     <div id="editInformation"></div>
 
     <div>
-      <button id="refreshTable" type="button" class="btn btn-dark btn-sm">Refresh Table</button>
+      <div id="refresh">
+        <button id="refreshTable" type="button" class="button">Refresh Table</button>
+      </div>
       <div id="tableTitle"></div>
       <table id="table" class="w-75 mx-auto table table-bordered table-striped"></table>
     </div>

@@ -32,6 +32,10 @@ app.get('/setup', (req, res) => {
   res.sendFile(path.join(__dirname, '/setup.html'));
 });
 
+app.get('/demo', (req, res) => {
+  res.sendFile(path.join(__dirname, '/demo.html'));
+});
+
 // *This code serves images*
 //front logo
 app.get('/images/frontlogo.png', (req, res) => {
